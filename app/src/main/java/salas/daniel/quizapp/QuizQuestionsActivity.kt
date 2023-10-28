@@ -17,6 +17,7 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     private var mSelectedOptionPosition: Int = 0
     private var mUserName: String? = null
     private var mCorrectAnswers: Int = 0
+    private var canAnswer : Boolean = true
 
     private var progressBar : ProgressBar? = null
     private var tvProgress : TextView? = null
@@ -63,7 +64,7 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun setQuestion(){
-
+        canAnswer = true
         defaultOptionsView()
 
         val question: Question = mQuestionsList!![mCurrentPosition - 1]
@@ -121,70 +122,72 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-        when (view?.id) {
-            R.id.tv_Option_One -> {
-                tvOptionOne?.let {
-                    selectedOptionView(it, 1)
-                }
-            }
-            R.id.tv_Option_Two -> {
-                tvOptionTwo?.let {
-                    selectedOptionView(it, 2)
+        if (canAnswer) {
+            when (view?.id) {
+                R.id.tv_Option_One -> {
+                    tvOptionOne?.let {
+                        selectedOptionView(it, 1)
                     }
                 }
-            R.id.tv_Option_Three -> {
-                tvOptionThree?.let {
-                    selectedOptionView(it, 3)
+                R.id.tv_Option_Two -> {
+                    tvOptionTwo?.let {
+                        selectedOptionView(it, 2)
                     }
                 }
-
-            R.id.tv_Option_Four -> {
-                tvOptionFour?.let {
-                    selectedOptionView(it, 4)
+                R.id.tv_Option_Three -> {
+                    tvOptionThree?.let {
+                        selectedOptionView(it, 3)
                     }
                 }
 
-            R.id.btn_submit -> {
-                if(mSelectedOptionPosition == 0){
-                    Log.e("mCurrentPosition:","$mCurrentPosition")
-                    if(mCurrentPosition < mQuestionsList!!.size) {
-                        mCurrentPosition++
-                    }else {
-                        val intent = Intent(this, ResultActivity::class.java)
-                        intent.putExtra(Constants.USER_NAME, mUserName)
-                        intent.putExtra(Constants.CORRECT_ANSWERS, mCorrectAnswers)
-                        intent.putExtra(Constants.TOTAL_QUESTION, mQuestionsList?.size)
-                        startActivity(intent)
-                        finish()
+                R.id.tv_Option_Four -> {
+                    tvOptionFour?.let {
+                        selectedOptionView(it, 4)
                     }
-                    when {
-                        mCurrentPosition <= mQuestionsList!!.size -> {
-                            setQuestion()
-                        }
-                    }
-                }else{
-                    Log.e("mCurrentPosition:","$mCurrentPosition")
-                    val question = mQuestionsList?.get(mCurrentPosition -1)
-                    if (question!!.correctAnswer != mSelectedOptionPosition){
-                        answerView(mSelectedOptionPosition, R.drawable.wrong_option_border_bg)
-                    }else{
-                        mCorrectAnswers++
-                    }
-                    answerView(question.correctAnswer,R.drawable.correct_option_border_bg)
-
-                    if(mCurrentPosition == mQuestionsList!!.size){
-                        btnSubmit?.text="Terminer"
-                    }else{
-                        btnSubmit?.text="Continuer"
-                    }
-
-                    mSelectedOptionPosition = 0
                 }
             }
         }
-    }
+        if(view?.id == R.id.btn_submit){
+                    if (mSelectedOptionPosition == 0) {
+                        Log.e("mCurrentPosition:", "$mCurrentPosition")
+                        if (mCurrentPosition < mQuestionsList!!.size) {
+                            mCurrentPosition++
+                        } else {
+                            val intent = Intent(this, ResultActivity::class.java)
+                            intent.putExtra(Constants.USER_NAME, mUserName)
+                            intent.putExtra(Constants.CORRECT_ANSWERS, mCorrectAnswers)
+                            intent.putExtra(Constants.TOTAL_QUESTION, mQuestionsList?.size)
+                            startActivity(intent)
+                            finish()
+                        }
+                        when {
+                            mCurrentPosition <= mQuestionsList!!.size -> {
+                                setQuestion()
+                            }
+                        }
+                    } else {
+                        Log.e("mCurrentPosition:", "$mCurrentPosition")
+                        val question = mQuestionsList?.get(mCurrentPosition - 1)
+                        if (question!!.correctAnswer != mSelectedOptionPosition) {
+                            answerView(mSelectedOptionPosition, R.drawable.wrong_option_border_bg)
+                        } else {
+                            mCorrectAnswers++
+                        }
+                        answerView(question.correctAnswer, R.drawable.correct_option_border_bg)
+
+                        if (mCurrentPosition == mQuestionsList!!.size) {
+                            btnSubmit?.text = "Terminer"
+                        } else {
+                            btnSubmit?.text = "Continuer"
+                        }
+
+                        mSelectedOptionPosition = 0
+                    }
+                }
+            }
 
     private fun answerView(answer: Int, drawableView: Int){
+        canAnswer = false
         when(answer){
             1 -> {
                 tvOptionOne?.background = ContextCompat.getDrawable(
