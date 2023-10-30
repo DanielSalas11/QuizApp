@@ -13,14 +13,14 @@ import androidx.core.content.ContextCompat
 class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
 
     private var mCurrentPosition: Int = 1
-    private var mQuestionsList:ArrayList<Question>? = null
+    private var mQuestionsList: ArrayList<Question>? = null
     private var mSelectedOptionPosition: Int = 0
     private var mUserName: String? = null
     private var mCorrectAnswers: Int = 0
-    private var canAnswer : Boolean = true
+    private var canAnswer: Boolean = true
 
-    private var progressBar : ProgressBar? = null
-    private var tvProgress : TextView? = null
+    private var progressBar: ProgressBar? = null
+    private var tvProgress: TextView? = null
     private var tvQuestion: TextView? = null
     private var ivImage: ImageView? = null
     private var btnSubmit: Button? = null
@@ -63,10 +63,11 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
-    private fun setQuestion(){
+    //This method sets the questionon the activity_quiz_questions xml.
+    private fun setQuestion() {
         canAnswer = true
         defaultOptionsView()
-
+        btnSubmit?.text = "Skip"
         val question: Question = mQuestionsList!![mCurrentPosition - 1]
         ivImage?.setImageResource(question.image)
         progressBar?.progress = mCurrentPosition
@@ -76,31 +77,26 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
         tvOptionTwo?.text = question.optionTwo
         tvOptionThree?.text = question.optionThree
         tvOptionFour?.text = question.optionFour
-
-        if(mCurrentPosition == mQuestionsList!!.size){
-            //btnSubmit?.text = "Soumettre"
-        }else{
-            btnSubmit?.text = "Valider"
-        }
     }
 
-    private fun defaultOptionsView(){
+    //Makes all the TextViews be on a non-clicked regular status
+    private fun defaultOptionsView() {
         val options = ArrayList<TextView>()
         btnSubmit?.text = "Valider"
-        tvOptionOne?.let{
-            options.add(0,it)
+        tvOptionOne?.let {
+            options.add(0, it)
         }
-        tvOptionTwo?.let{
-            options.add(1,it)
+        tvOptionTwo?.let {
+            options.add(1, it)
         }
-        tvOptionThree?.let{
-            options.add(2,it)
+        tvOptionThree?.let {
+            options.add(2, it)
         }
-        tvOptionFour?.let{
-            options.add(3,it)
+        tvOptionFour?.let {
+            options.add(3, it)
         }
 
-        for(option in options){
+        for (option in options) {
             option.setTextColor(Color.parseColor("#7A8089"))
             option.typeface = Typeface.DEFAULT
             option.background = ContextCompat.getDrawable(
@@ -110,7 +106,8 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun selectedOptionView(tv:TextView, selectedOptionNum: Int){
+    //Allows to select an option and give a visual indicator of it
+    private fun selectedOptionView(tv: TextView, selectedOptionNum: Int) {
         defaultOptionsView()
         mSelectedOptionPosition = selectedOptionNum
         tv.setTextColor(Color.parseColor("#363A43"))
@@ -121,6 +118,7 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
         )
     }
 
+    //Checks if the question can be answered and selects it with the selectedOptionView(), also allows to submit answers
     override fun onClick(view: View?) {
         if (canAnswer) {
             when (view?.id) {
@@ -147,45 +145,46 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
-        if(view?.id == R.id.btn_submit){
-                    if (mSelectedOptionPosition == 0) {
-                        Log.e("mCurrentPosition:", "$mCurrentPosition")
-                        if (mCurrentPosition < mQuestionsList!!.size) {
-                            mCurrentPosition++
-                        } else {
-                            val intent = Intent(this, ResultActivity::class.java)
-                            intent.putExtra(Constants.USER_NAME, mUserName)
-                            intent.putExtra(Constants.CORRECT_ANSWERS, mCorrectAnswers)
-                            intent.putExtra(Constants.TOTAL_QUESTION, mQuestionsList?.size)
-                            startActivity(intent)
-                            finish()
-                        }
-                        when {
-                            mCurrentPosition <= mQuestionsList!!.size -> {
-                                setQuestion()
-                            }
-                        }
-                    } else {
-                        Log.e("mCurrentPosition:", "$mCurrentPosition")
-                        val question = mQuestionsList?.get(mCurrentPosition - 1)
-                        if (question!!.correctAnswer != mSelectedOptionPosition) {
-                            answerView(mSelectedOptionPosition, R.drawable.wrong_option_border_bg)
-                        } else {
-                            mCorrectAnswers++
-                        }
-                        answerView(question.correctAnswer, R.drawable.correct_option_border_bg)
-
-                        if (mCurrentPosition == mQuestionsList!!.size) {
-                            btnSubmit?.text = "Terminer"
-                        } else {
-                            btnSubmit?.text = "Continuer"
-                        }
-
-                        mSelectedOptionPosition = 0
+        if (view?.id == R.id.btn_submit) {
+            if (mSelectedOptionPosition == 0) {
+                Log.e("mCurrentPosition:", "$mCurrentPosition")
+                if (mCurrentPosition < mQuestionsList!!.size) {
+                    mCurrentPosition++
+                } else {
+                    val intent = Intent(this, ResultActivity::class.java)
+                    intent.putExtra(Constants.USER_NAME, mUserName)
+                    intent.putExtra(Constants.CORRECT_ANSWERS, mCorrectAnswers)
+                    intent.putExtra(Constants.TOTAL_QUESTION, mQuestionsList?.size)
+                    startActivity(intent)
+                    finish()
+                }
+                when {
+                    mCurrentPosition <= mQuestionsList!!.size -> {
+                        setQuestion()
                     }
                 }
-            }
+            } else {
+                Log.e("mCurrentPosition:", "$mCurrentPosition")
+                val question = mQuestionsList?.get(mCurrentPosition - 1)
+                if (question!!.correctAnswer != mSelectedOptionPosition) {
+                    answerView(mSelectedOptionPosition, R.drawable.wrong_option_border_bg)
+                } else {
+                    mCorrectAnswers++
+                }
+                answerView(question.correctAnswer, R.drawable.correct_option_border_bg)
 
+                if (mCurrentPosition == mQuestionsList!!.size) {
+                    btnSubmit?.text = "Terminer"
+                } else {
+                    btnSubmit?.text = "Continuer"
+                }
+
+                mSelectedOptionPosition = 0
+            }
+        }
+    }
+
+    //Checks answers
     private fun answerView(answer: Int, drawableView: Int){
         canAnswer = false
         when(answer){
