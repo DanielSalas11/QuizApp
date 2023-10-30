@@ -72,9 +72,8 @@
         <TextView
             android:id="@+id/tv_Option_Two"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:layout_weight="1"
             android:gravity="center"
             android:textAlignment="center"
             android:background="@drawable/default_option_border_bg"
